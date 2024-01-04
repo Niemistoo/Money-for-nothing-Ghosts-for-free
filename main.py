@@ -50,11 +50,10 @@ class Game:
         self.check_ghost_collision()
         self.check_platform_collision()
         self.check_coin_collision()
-
     
     def draw(self):
-        self.WIN.fill("white")
         self.WIN.blit(self.BG_IMAGE, (0,0))
+        self.WIN.blit(self.score.show_score(), (600, 30))
 
         self.player.draw()
         self.map.draw(self.WIN)
@@ -62,29 +61,19 @@ class Game:
         self.coins.draw(self.WIN)
         self.HUD.draw()
 
-
         pygame.display.flip()
         self.CLOCK.tick(self.FPS)
 
     def check_event(self):
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-    def run(self):
-        while True:
-            if len(self.ghosts) < 1:
-                self.add_ghost()
-            self.check_event()
-            self.update()
-            self.draw()
-
     def add_ghost(self):
         x = self.WIDTH // 2
         y = self.HEIGHT // 2
-        speed = random.choice([2, 5])  # Random speed
+        speed = random.choice([2, 5])
         ghost = Ghost(x, y, speed, self.player.rect)
         self.ghosts.add(ghost)
 
@@ -98,14 +87,11 @@ class Game:
     def check_ghost_collision(self):
         self.player.rect = self.player.get_rect()
         for ghost in self.ghosts:
-            if self.player.rect.colliderect(ghost.rect) and time.perf_counter() - self.hit_timer > 3:
-                print(time.perf_counter() - self.hit_timer)
-                print("osuma")
+            if self.player.rect.colliderect(ghost.rect) and time.perf_counter() - self.hit_timer > 1:
                 self.hit_timer = time.perf_counter()
                 self.player.health -= 1
                 if self.player.health <= 0:
                     self.game_on = False
-                    print("GAME OVER")
 
     def check_platform_collision(self):
 
@@ -115,11 +101,10 @@ class Game:
         for platform in self.map.platforms:
             if platform.rect.colliderect(self.player.rect) and self.player.rect.bottom >= platform.rect.top and self.player.direction.y > 0:
                 if self.player.direction.y > 0:
-                    if self.player.rect.bottom - platform.rect.top - self.player.direction.y  <= 0:
+                    if self.player.rect.bottom - platform.rect.top - self.player.direction.y <= 0:
                         self.player.y_position = platform.rect.top - self.player.image_height
                         self.player.direction.y = 0
-                        self.player.on_platform = True
-                
+                        self.player.on_platform = True        
                 else:
                     self.player.on_platform = False
                     
@@ -135,6 +120,42 @@ class Game:
                 self.score.update_score()
                 self.add_coin()
 
+    def game_over(self):
+        while self.game_on == False:
+            self.WIN.fill("white")
+            font = pygame.font.SysFont("Arial", 50)
+            text = font.render(f"YOU DIED, Play Again? Y/N", True, (0,0,0))
+            rect = text.get_rect()
+            score = self.score.show_score()
+            self.WIN.blit(text, ((self.WIDTH/2) - (rect.width/2), (self.HEIGHT/2) - (rect.height/2)))
+            self.WIN.blit(score, (600, 30))
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_y:
+                        self.game_on == True
+                        self.new_game()
+                        return True
+
+                    elif event.key == pygame.K_n:
+                        pygame.quit()
+                        sys.exit()
+
+                elif event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+    def run(self):
+        while self.game_on:
+            if len(self.ghosts) < 1:
+                self.add_ghost()
+            self.check_event()
+            self.update()
+            self.draw()
+
 if __name__ == "__main__":
-    game = Game()
-    game.run()
+    while True:
+        game = Game()
+        game.run()
+        game.game_over()

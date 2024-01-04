@@ -6,6 +6,9 @@ class Score:
         self.score = 0
         self.font = pygame.font.SysFont("Arial", 24)
     
+    def update(self):
+        self.show_score()
+    
     def update_score(self):
         self.score += 1
         print(self.score)

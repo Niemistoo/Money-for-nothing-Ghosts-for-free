@@ -9,11 +9,11 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load("player.png")
         self.image_width = self.image.get_width()
         self.image_height = self.image.get_height()
-        self.x_position = game.WIDTH // 2
+        self.x_position = game.WIDTH/2 - (self.image_width/2)
         self.y_position = game.HEIGHT - self.image_height
-        self.rect = pygame.Rect(self.x_position +25, self.y_position +6, 15, 58)
+        self.rect = pygame.Rect(self.x_position + 25, self.y_position + 6, 15, 58)
 
-        self.direction = pygame.math.Vector2(0,0)
+        self.direction = pygame.math.Vector2(0, 0)
         self.step = False
 
         self.speed = 5
@@ -44,7 +44,6 @@ class Player(pygame.sprite.Sprite):
         if self.x_position > self.game.WIDTH:
             self.x_position = -self.image_width
         
-
     def apply_gravity(self):
         if self.direction.y < 20:
             self.direction.y += self.gravity
@@ -91,7 +90,6 @@ class Player(pygame.sprite.Sprite):
         if self.direction.x == 0:    # Draw player standing image
             self.image = pygame.image.load("player.png")
         
-        
         self.game.WIN.blit(self.image, (self.x_position, self.y_position))
 
     def get_player_health(self):
@@ -100,7 +98,7 @@ class Player(pygame.sprite.Sprite):
 class Ghost(pygame.sprite.Sprite):
     def __init__(self, x, y, speed, direction):
         super().__init__()
-        self.image = pygame.image.load("hirvio.png")
+        self.image = pygame.image.load("ghost.png")
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.speed = speed
@@ -119,7 +117,7 @@ class Ghost(pygame.sprite.Sprite):
 class Coin(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load("kolikko.png")
+        self.image = pygame.image.load("coin.png")
         self.rect = self.image.get_rect()
         self.rect.midbottom = (x, y)
 
